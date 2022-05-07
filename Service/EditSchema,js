@@ -1,0 +1,36 @@
+// const { date, number } = require("joi");
+// const mongoose = require("mongoose");
+
+// const Editschema =new mongoose.Schema({
+//    name:{
+//     type: String,
+//     required: true,
+//     minLength: 4,
+//    },
+//   biodata: {
+//     type: String,
+//     required: true,
+//     minLength: 4,
+//   },
+//   gender:{
+//     type: String,
+//     required: true,
+//   },
+//   dateofbirth:{
+//     type: date,
+//     required: true,
+//     minLength: 4,
+//   },
+//   email: {
+//     type: email,
+//     required: true,
+//     minLength: 4,
+//   },
+//   mobile:{
+//     type: number,
+//     required: true,
+//     minLength: 4,
+//   }
+// });
+
+// module.exports = mongoose.model("Edit", Editschema);
