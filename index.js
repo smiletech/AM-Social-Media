@@ -8,6 +8,7 @@ var bodyParser = require("body-parser");
 const edit = require("./router/Edit");
 const login = require("./router/login");
 const register = require("./router/register");
+const fileUpload = require("express-fileupload");
 
 const app = express();
 dotenv.config();
@@ -29,6 +30,8 @@ const db = mongoose.connect(
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 //   midlleware
+
+app.use(fileUpload({useTempFiles:true}));
 
 app.use(express.json());
 app.use(cors());

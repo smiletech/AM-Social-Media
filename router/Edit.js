@@ -50,8 +50,7 @@ router.put("/edit-profile/:UserId", verify, imgUpload, async (req, res) => {
 });
 
 //
-router.put("/delete-image/:UserId", async (req, res) => {
-  console.log("jhjhjh");
+router.put("/delete-image/:UserId",verify, async (req, res) => {
   try {
     const Updated = await User.findOneAndUpdate(
       { _id: req.params.UserId },
@@ -81,7 +80,7 @@ router.put("/delete-image/:UserId", async (req, res) => {
 
 router.put("/editprofile/:UserId", verify, async (req, res) => {
   try {
-    // const value = await Editschema.validateAsync(req.body);
+  const value = await Editschema.validateAsync(req.body);
     console.log(req.body.firstname);
     const Updated = await User.findOneAndUpdate(
       { _id: req.params.UserId },
@@ -110,10 +109,11 @@ router.put("/editprofile/:UserId", verify, async (req, res) => {
     return res.status(400).json({ status: false, message: err });
   }
 });
+//**************************** */
 // default API for edit
-
 router.get("/profile/:id", verify, async (req, res) => {
   try {
+    
     const users = await User.findOne({ _id: req.params.id });
     return res.status(200).json({ status: true, users });
   } catch (err) {
@@ -124,7 +124,7 @@ router.get("/profile/:id", verify, async (req, res) => {
 
 
 
-// 
+// *******Extra API **********
 router.get("/All", async (req, res) => {
   const users = await User.find();
   return res.status(200).json({ status: true, users });

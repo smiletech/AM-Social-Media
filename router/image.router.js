@@ -2,7 +2,56 @@ const router = require("express").Router();
 const Feed = require("../Models/imgconfig");
 const verify = require("../Service/verify");
 const imgUpload = require("../imgfile");
+const dotenv = require("dotenv");
 
+const cloudinary=require("cloudinary").v2
+
+dotenv.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
+});
+
+router.post("/post",(req, res,nex) => {
+const file=req.files.image
+console.log(file);
+
+cloudinary.uploader.upload(file.tempFilePath,async(err,result)=>{
+  console.log(result);
+
+ const feed = new Feed({
+    img: result.secure_url,
+    caption: req.body.caption,
+    username: req.body.username,
+  });
+
+  try {
+    const updatepost = await feed.save();
+    return res.send({
+      success: true,
+      message: "Post Inserted successfully",
+      updatepost,
+    });
+  } catch (err) {
+    return res.status(400).send({
+      success: false,
+      message: err,
+    });
+  }
+
+
+
+})
+
+ });
+
+
+
+
+
+// *****************************************************
 router.post("/upload", verify, imgUpload, async (req, res) => {
   console.log("first");
   if (req.file) {
@@ -18,32 +67,35 @@ router.post("/upload", verify, imgUpload, async (req, res) => {
   }
 });
 
-// post router for feed post
 
-router.post("/post", imgUpload, async (req, res) => {
-  const feed = new Feed({
-    img: req.file.filename,
-    caption: req.body.caption,
-    username: req.body.username,
-  });
-  try {
-    const updatepost = await feed.save();
-    return res.send({
-      success: true,
-      message: "Post Inserted successfully",
-      updatepost,
-    });
-  } catch (err) {
-    return res.status(400).send({
-      success: false,
-      message: err,
-    });
-  }
-});
+
+// post router for feed post
+// router.post("/post",verify, imgUpload, async (req, res) => {
+//   const feed = new Feed({
+//     img: req.file.filename,
+//     caption: req.body.caption,
+//     username: req.body.username,
+//   });
+
+//   try {
+//     const updatepost = await feed.save();
+//     return res.send({
+//       success: true,
+//       message: "Post Inserted successfully",
+//       updatepost,
+//     });
+//   } catch (err) {
+//     return res.status(400).send({
+//       success: false,
+//       message: err,
+//     });
+//   }
+// });
 
 //
 //localhost:8080/?page=1&limit=3000
-http: router.get("/", verify, async (req, res) => {
+
+router.get("/", verify, async (req, res) => {
   const page = parseInt(req.query.page);
   const size = parseInt(req.query.limit);
 
@@ -70,9 +122,10 @@ http: router.get("/", verify, async (req, res) => {
       message: error.details[0].message,
     });
   }
+  console.log("ok");
 });
 
-//
+//**************Extra Api  */
 router.put("/:Id", verify, imgUpload, async (req, res) => {
   try {
     const Updated = await Feed.findOneAndUpdate(
@@ -98,12 +151,11 @@ router.put("/:Id", verify, imgUpload, async (req, res) => {
   }
 });
 
-router.put("/like/:id", async (req, res) => {
-
+// ********APIs************
+router.put("/like/:id",verify, async (req, res) => {
   const userid = req.body.id;
   const userComment = req.body.comment || "";
   const userCommenter = req.body.commenter || "";
-
   try {
     const users = await Feed.findOne({ _id: req.params.id });
     if (!users) return res.status(400).json({ status: false, users });
@@ -156,5 +208,6 @@ router.delete("/:Id", verify, async (req, res) => {
     return res.status(400).json({ status: false, message: err.message });
   }
 });
+
 
 module.exports = router;
